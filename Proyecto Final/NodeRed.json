@@ -1,0 +1,813 @@
+[
+    {
+        "id": "913428f966c4008e",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "ee08b54f.caa4c",
+        "type": "mqtt in",
+        "z": "913428f966c4008e",
+        "name": "",
+        "topic": "temperatura",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 210,
+        "y": 180,
+        "wires": [
+            [
+                "3a517467.b8e7d4",
+                "ce311e52.370168",
+                "deee6e0e865859ee"
+            ]
+        ]
+    },
+    {
+        "id": "17abc6b7.272ff1",
+        "type": "change",
+        "z": "913428f966c4008e",
+        "name": "toNumber",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "msg.parts.index=0? $number(msg.payload)*1000:$number(msg.payload)\t",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "msg.parts.index? \"payload\":\"timestamp\"\t",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 180,
+        "wires": [
+            [
+                "5ed09aec.92d34c"
+            ]
+        ]
+    },
+    {
+        "id": "3a517467.b8e7d4",
+        "type": "split",
+        "z": "913428f966c4008e",
+        "name": "",
+        "splt": ",",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 390,
+        "y": 180,
+        "wires": [
+            [
+                "17abc6b7.272ff1"
+            ]
+        ]
+    },
+    {
+        "id": "5ed09aec.92d34c",
+        "type": "switch",
+        "z": "913428f966c4008e",
+        "name": "route",
+        "property": "parts.index",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "2",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 690,
+        "y": 180,
+        "wires": [
+            [
+                "adb437b945fe76ac",
+                "558ab415f14aebd9"
+            ],
+            [
+                "a2f3472e.4c785",
+                "558ab415f14aebd9"
+            ],
+            [
+                "8f5e9f01.951ca",
+                "adb437b945fe76ac"
+            ]
+        ]
+    },
+    {
+        "id": "a2f3472e.4c785",
+        "type": "ui_gauge",
+        "z": "913428f966c4008e",
+        "name": "",
+        "group": "dfc653fe.ed6cf",
+        "order": 2,
+        "width": 6,
+        "height": 5,
+        "gtype": "gage",
+        "title": "Temperatura 1",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": "24",
+        "max": "35",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 1260,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "8f5e9f01.951ca",
+        "type": "ui_gauge",
+        "z": "913428f966c4008e",
+        "name": "",
+        "group": "dfc653fe.ed6cf",
+        "order": 4,
+        "width": 6,
+        "height": 5,
+        "gtype": "gage",
+        "title": "Temperatura 2",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": "24",
+        "max": "35",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 1260,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "597a01f0.47d4f",
+        "type": "ui_switch",
+        "z": "913428f966c4008e",
+        "name": "",
+        "label": "FireBase",
+        "tooltip": "",
+        "group": "dfc653fe.ed6cf",
+        "order": 9,
+        "width": 3,
+        "height": 1,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 200,
+        "y": 500,
+        "wires": [
+            [
+                "c06dd5dc.e20408"
+            ]
+        ]
+    },
+    {
+        "id": "ce311e52.370168",
+        "type": "function",
+        "z": "913428f966c4008e",
+        "name": "",
+        "func": "const data = msg.payload.split(',');\nconst timestamp = new Date(Number(data[0]*1000)-18000000);\nconst date = timestamp.toISOString().slice(0,10);\nconst time = timestamp.toISOString().slice(11,19);\nconst level = (global.get('swTraining'))?'training':'dataset';\n\nif(global.get('swFB')){\n    msg.method = 'patch';\n    msg.url = `URL FIREBASE/${level}/${date}/${time}.json`;\n    msg.payload = `{\"t1\":${Number(data[1])},\n                    \"t2\":${Number(data[2])}}`;\n    msg.headers = {};\n    msg.headers['content-type'] = 'application/json';\n    return msg;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 300,
+        "wires": [
+            [
+                "f29dbd3f12e14158"
+            ]
+        ]
+    },
+    {
+        "id": "c06dd5dc.e20408",
+        "type": "change",
+        "z": "913428f966c4008e",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "swFB",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f29dbd3f12e14158",
+        "type": "http request",
+        "z": "913428f966c4008e",
+        "name": "",
+        "method": "use",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "x": 590,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a152d8ae8a252539",
+        "type": "ui_switch",
+        "z": "913428f966c4008e",
+        "name": "",
+        "label": "ThingSpeak",
+        "tooltip": "",
+        "group": "dfc653fe.ed6cf",
+        "order": 6,
+        "width": 3,
+        "height": 1,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 210,
+        "y": 560,
+        "wires": [
+            [
+                "7a317fd89c80ca79"
+            ]
+        ]
+    },
+    {
+        "id": "7a317fd89c80ca79",
+        "type": "change",
+        "z": "913428f966c4008e",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "swTS",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "adb437b945fe76ac",
+        "type": "join",
+        "z": "913428f966c4008e",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 870,
+        "y": 260,
+        "wires": [
+            [
+                "ec97e91c9acf6d09"
+            ]
+        ]
+    },
+    {
+        "id": "ec97e91c9acf6d09",
+        "type": "change",
+        "z": "913428f966c4008e",
+        "name": "",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload.timestamp",
+                "pt": "msg",
+                "to": "timestamp",
+                "tot": "msg"
+            },
+            {
+                "t": "move",
+                "p": "payload.payload",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "topic",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1060,
+        "y": 260,
+        "wires": [
+            [
+                "85be837d932b559a"
+            ]
+        ]
+    },
+    {
+        "id": "85be837d932b559a",
+        "type": "ui_chart",
+        "z": "913428f966c4008e",
+        "name": "",
+        "group": "dfc653fe.ed6cf",
+        "order": 5,
+        "width": 11,
+        "height": 5,
+        "label": "chart",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1230,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1457a9568127bef6",
+        "type": "change",
+        "z": "913428f966c4008e",
+        "name": "",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload.timestamp",
+                "pt": "msg",
+                "to": "timestamp",
+                "tot": "msg"
+            },
+            {
+                "t": "move",
+                "p": "payload.payload",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "delete",
+                "p": "topic",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1060,
+        "y": 100,
+        "wires": [
+            [
+                "e8bda14952644d6a"
+            ]
+        ]
+    },
+    {
+        "id": "558ab415f14aebd9",
+        "type": "join",
+        "z": "913428f966c4008e",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 870,
+        "y": 100,
+        "wires": [
+            [
+                "1457a9568127bef6"
+            ]
+        ]
+    },
+    {
+        "id": "e8bda14952644d6a",
+        "type": "ui_chart",
+        "z": "913428f966c4008e",
+        "name": "",
+        "group": "dfc653fe.ed6cf",
+        "order": 3,
+        "width": 11,
+        "height": 5,
+        "label": "chart",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1230,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "73bbd25de3a08b33",
+        "type": "ui_switch",
+        "z": "913428f966c4008e",
+        "name": "",
+        "label": "entrenamiento",
+        "tooltip": "",
+        "group": "dfc653fe.ed6cf",
+        "order": 10,
+        "width": 3,
+        "height": 1,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": true,
+        "className": "",
+        "x": 220,
+        "y": 620,
+        "wires": [
+            [
+                "2b13b0cc78c4dc7f"
+            ]
+        ]
+    },
+    {
+        "id": "2b13b0cc78c4dc7f",
+        "type": "change",
+        "z": "913428f966c4008e",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "swTraining",
+                "pt": "global",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 480,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "deee6e0e865859ee",
+        "type": "function",
+        "z": "913428f966c4008e",
+        "name": "",
+        "func": "const data = msg.payload.split(',');\nconst timestamp = new Date(Number(data[0]*1000)-18000000);\nconst date = timestamp.toISOString().slice(0,10);\nconst time = timestamp.toISOString().slice(11,19);\n\nif(global.get('swTS')){\n    msg.method = 'post';\n    msg.url = `https://api.thingspeak.com/update.json`;\n    msg.payload = `{\"api_key\": \"WRITE_KEY\",\n                    \"created_at\": \"${date} ${time} -0500\",\n                    \"field1\":${Number(data[1])},\n                    \"field2\":${Number(data[2])}}`;\n    msg.headers = {};\n    msg.headers['content-type'] = 'application/json';\n    return msg;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 400,
+        "wires": [
+            [
+                "d6da9f7dd4961bed"
+            ]
+        ]
+    },
+    {
+        "id": "d6da9f7dd4961bed",
+        "type": "http request",
+        "z": "913428f966c4008e",
+        "name": "",
+        "method": "use",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "x": 590,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "eb2afc84689a52a9",
+        "type": "http request",
+        "z": "913428f966c4008e",
+        "name": "",
+        "method": "DELETE",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://api.thingspeak.com/channels/CHANNEL_ID/feeds.json?api_key=APIKEY",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "x": 450,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "aec489a4.36eb68",
+        "type": "ui_template",
+        "z": "913428f966c4008e",
+        "group": "dfc653fe.ed6cf",
+        "name": "Clear TS",
+        "order": 7,
+        "width": 4,
+        "height": 2,
+        "format": "\n<md-button class=\"vibrate filled touched bigfont rounded\" style=\"background-color:#2980b9\"   ng-click=\"send({payload: ''})\"> \n    Borrar Gráficos<br/>en ThingSpeak\n</md-button> \n\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 200,
+        "y": 680,
+        "wires": [
+            [
+                "eb2afc84689a52a9"
+            ]
+        ]
+    },
+    {
+        "id": "22a5ea5e.7e2936",
+        "type": "ui_template",
+        "z": "913428f966c4008e",
+        "group": "dfc653fe.ed6cf",
+        "name": "css etc",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n  .filled { \n      height: 100% !important;\n\n      padding: 0 !important;\n      margin: 0 !important;\n  }\n  .nr-dashboard-template {\n      padding: 0;\n      margin: 0;\n  }\n  \n  .rounded {\n  border-radius: 12px 12px 12px 12px;\n}\n \n   .bigfont {\n  font-size: 18px;\n}\n\n   .smallfont {\n  font-size: 12px;\n}\n  \n</style>\n\n<script>\n$('.vibrate').on('click', function() {\n  navigator.vibrate(100);\n});\n\nfunction restore_bg(x) {\n            $(this).css(\"background-color\", x);\n    };\n\n$('.touched').on('mousedown', function() {\n    \n    var x= $(this).css(\"background-color\");\n    $(this).css(\"background-color\", \"yellow\");\n    \n    setTimeout(restore_bg.bind(this,x),100);\n    navigator.vibrate(80);\n    });\n    \n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 200,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "944f336e96e20346",
+        "type": "ui_template",
+        "z": "913428f966c4008e",
+        "group": "dfc653fe.ed6cf",
+        "name": "Clear NR",
+        "order": 8,
+        "width": 4,
+        "height": 2,
+        "format": "\n<md-button class=\"vibrate filled touched bigfont rounded\" style=\"background-color:#2980b9\"   ng-click=\"send({payload: []})\"> \n    Borrar Gráficos\n</md-button> \n\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 1060,
+        "y": 180,
+        "wires": [
+            [
+                "e8bda14952644d6a",
+                "85be837d932b559a",
+                "a2f3472e.4c785",
+                "8f5e9f01.951ca"
+            ]
+        ]
+    },
+    {
+        "id": "b0c5a60e39c69511",
+        "type": "comment",
+        "z": "913428f966c4008e",
+        "name": "Firebase",
+        "info": "Envío de datos a Firebase. En el nodo function configurar la URL de Firebase",
+        "x": 400,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "89e3c101c55e11b7",
+        "type": "comment",
+        "z": "913428f966c4008e",
+        "name": "ThingSpeak",
+        "info": "Envío de datos a ThingSpeak. En el nodo function modificar el Write Key de ThingSpeak",
+        "x": 410,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "80b786d78719a6e4",
+        "type": "comment",
+        "z": "913428f966c4008e",
+        "name": "Clear ThingSpeak",
+        "info": "Borra los gráficos en ThingSpeak. En el nodo http request modificar el Channel id y el API KEY general de ThingSpeak",
+        "x": 630,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "454dd2f349077b13",
+        "type": "ui_spacer",
+        "z": "913428f966c4008e",
+        "name": "spacer",
+        "group": "dfc653fe.ed6cf",
+        "order": 11,
+        "width": 3,
+        "height": 1
+    },
+    {
+        "id": "390d8ca6d0737d6d",
+        "type": "ui_spacer",
+        "z": "913428f966c4008e",
+        "name": "spacer",
+        "group": "dfc653fe.ed6cf",
+        "order": 12,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "dfc653fe.ed6cf",
+        "type": "ui_group",
+        "name": "Proyecto",
+        "tab": "a12bd387.9e9b18",
+        "order": 1,
+        "disp": true,
+        "width": 17,
+        "collapse": false
+    },
+    {
+        "id": "a12bd387.9e9b18",
+        "type": "ui_tab",
+        "name": "Proyecto",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
