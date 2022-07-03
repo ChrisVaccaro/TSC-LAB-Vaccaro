@@ -64,7 +64,21 @@ void setup() {
   
   //Wifi
   WiFi.mode(WIFI_STA);
-  connect_wifi();
+  //La primera vez debe conectarse a internet para luego obtener la fecha/hora inicial
+  while (WiFi.status() != WL_CONNECTED)
+    connect_wifi();
+  //Hora
+  configTime(-18000, 0, ntpServer);
+  //Debe configurarse por primera vez la hora para empezar
+  if(!getLocalTime(&timeinfo)){
+    DEBUG_PRINT("No hay acceso a Internet en la red: ");
+    DEBUG_PRINTLN(ssid);
+    DEBUG_PRINTLN("No se puede obtener la hora actual. Revise el WiFi");
+    while(!getLocalTime(&timeinfo));
+  }
+  
+  DEBUG_PRINTLN(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  DEBUG_PRINTLN(getEpoch());
   
   //transistor 1
   pinMode(trans1, OUTPUT);
@@ -75,14 +89,6 @@ void setup() {
   //Sensores
   sensors1.begin();   //Sensor 1 starts
   sensors2.begin();   //Sensor 2 starts
-
-  //Hora
-  configTime(-18000, 0, ntpServer);
-  //Debe configurarse por primera vez la hora para empezar
-  while(!getLocalTime(&timeinfo));
-  
-  DEBUG_PRINTLN(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-  DEBUG_PRINTLN(getEpoch());
 
   //MQTT
   client.setServer(mqtt_broker, mqtt_port);
